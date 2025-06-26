@@ -9,16 +9,16 @@ export type User = {
   password: string;
 };
 
-export type Customer = {
+export type Company = {
   id: string;
   name: string;
-  email: string;
+  ticker: string;
   image_url: string;
 };
 
-export type Invoice = {
+export type Investment = {
   id: string;
-  customer_id: string;
+  company_id: string;
   amount: number;
   date: string;
   // In TypeScript, this is called a string union type.
@@ -26,63 +26,63 @@ export type Invoice = {
   status: 'pending' | 'paid';
 };
 
-export type Revenue = {
+export type Profit = {
   month: string;
   revenue: number;
 };
 
-export type LatestInvoice = {
+export type LatestInvestment = {
   id: string;
   name: string;
   image_url: string;
-  email: string;
+  ticker: string;
   amount: string;
 };
 
 // The database returns a number for amount, but we later format it to a string with the formatCurrency function
-export type LatestInvoiceRaw = Omit<LatestInvoice, 'amount'> & {
+export type LatestInvestmentRaw = Omit<LatestInvestment, 'amount'> & {
   amount: number;
 };
 
-export type InvoicesTable = {
+export type InvestmentsTable = {
   id: string;
-  customer_id: string;
+  company_id: string;
   name: string;
-  email: string;
+  ticker: string;
   image_url: string;
   date: string;
   amount: number;
   status: 'pending' | 'paid';
 };
 
-export type CustomersTableType = {
+export type CompaniesTableType = {
   id: string;
   name: string;
-  email: string;
+  ticker: string;
   image_url: string;
-  total_invoices: number;
+  total_investments: number;
   total_pending: number;
   total_paid: number;
 };
 
-export type FormattedCustomersTable = {
+export type FormattedCompaniesTable = {
   id: string;
   name: string;
-  email: string;
+  ticker: string;
   image_url: string;
-  total_invoices: number;
+  total_investments: number;
   total_pending: string;
   total_paid: string;
 };
 
-export type CustomerField = {
+export type CompanyField = {
   id: string;
   name: string;
 };
 
-export type InvoiceForm = {
+export type InvestmentForm = {
   id: string;
-  customer_id: string;
+  company_id: string;
   amount: number;
   status: 'pending' | 'paid';
 };

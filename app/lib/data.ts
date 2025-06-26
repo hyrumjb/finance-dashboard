@@ -1,11 +1,11 @@
 import postgres from 'postgres';
 import {
-  CustomerField,
-  CustomersTableType,
-  InvoiceForm,
-  InvoicesTable,
-  LatestInvoiceRaw,
-  Revenue,
+  CompanyField,
+  CompaniesTableType,
+  InvestmentForm,
+  InvestmentsTable,
+  LatestInvestmentRaw,
+  Profit,
 } from './definitions';
 import { formatCurrency } from './utils';
 
@@ -13,40 +13,32 @@ const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
 export async function fetchRevenue() {
   try {
-    // Artificially delay a response for demo purposes.
-    // Don't do this in production :)
-
-    // console.log('Fetching revenue data...');
-    // await new Promise((resolve) => setTimeout(resolve, 3000));
-
-    const data = await sql<Revenue[]>`SELECT * FROM revenue`;
-
-    // console.log('Data fetch completed after 3 seconds.');
+    const data = await sql<Profit[]>`SELECT * FROM profit`;
 
     return data;
   } catch (error) {
     console.error('Database Error:', error);
-    throw new Error('Failed to fetch revenue data.');
+    throw new Error('Failed to fetch profit data.');
   }
 }
 
-export async function fetchLatestInvoices() {
+export async function fetchLatestInvestments() {
   try {
-    const data = await sql<LatestInvoiceRaw[]>`
-      SELECT invoices.amount, customers.name, customers.image_url, customers.email, invoices.id
-      FROM invoices
-      JOIN customers ON invoices.customer_id = customers.id
-      ORDER BY invoices.date DESC
+    const data = await sql<LatestInvestmentRaw[]>`
+      SELECT investments.amount, companies.name, companies.image_url, companies.ticker, investments.id
+      FROM investments
+      JOIN companies ON investments.company_id = companies.id
+      ORDER BY investments.date DESC
       LIMIT 5`;
 
-    const latestInvoices = data.map((invoice) => ({
-      ...invoice,
-      amount: formatCurrency(invoice.amount),
+    const latestInvestments = data.map((investment) => ({
+      ...investment,
+      amount: formatCurrency(investment.amount),
     }));
-    return latestInvoices;
+    return latestInvestments;
   } catch (error) {
     console.error('Database Error:', error);
-    throw new Error('Failed to fetch the latest invoices.');
+    throw new Error('Failed to fetch the latest investments.');
   }
 }
 
@@ -55,29 +47,29 @@ export async function fetchCardData() {
     // You can probably combine these into a single SQL query
     // However, we are intentionally splitting them to demonstrate
     // how to initialize multiple queries in parallel with JS.
-    const invoiceCountPromise = sql`SELECT COUNT(*) FROM invoices`;
-    const customerCountPromise = sql`SELECT COUNT(*) FROM customers`;
-    const invoiceStatusPromise = sql`SELECT
+    const investmentCountPromise = sql`SELECT COUNT(*) FROM investments`;
+    const companyCountPromise = sql`SELECT COUNT(*) FROM companies`;
+    const investmentStatusPromise = sql`SELECT
          SUM(CASE WHEN status = 'paid' THEN amount ELSE 0 END) AS "paid",
          SUM(CASE WHEN status = 'pending' THEN amount ELSE 0 END) AS "pending"
          FROM invoices`;
 
     const data = await Promise.all([
-      invoiceCountPromise,
-      customerCountPromise,
-      invoiceStatusPromise,
+      investmentCountPromise,
+      companyCountPromise,
+      investmentStatusPromise,
     ]);
 
-    const numberOfInvoices = Number(data[0][0].count ?? '0');
-    const numberOfCustomers = Number(data[1][0].count ?? '0');
-    const totalPaidInvoices = formatCurrency(data[2][0].paid ?? '0');
-    const totalPendingInvoices = formatCurrency(data[2][0].pending ?? '0');
+    const numberOfInvestments = Number(data[0][0].count ?? '0');
+    const numberOfCompanies = Number(data[1][0].count ?? '0');
+    const totalPaidInvestments = formatCurrency(data[2][0].paid ?? '0');
+    const totalPendingInvestments = formatCurrency(data[2][0].pending ?? '0');
 
     return {
-      numberOfCustomers,
-      numberOfInvoices,
-      totalPaidInvoices,
-      totalPendingInvoices,
+      numberOfCompanies,
+      numberOfInvestments,
+      totalPaidInvestments,
+      totalPendingInvestments,
     };
   } catch (error) {
     console.error('Database Error:', error);
@@ -86,134 +78,134 @@ export async function fetchCardData() {
 }
 
 const ITEMS_PER_PAGE = 6;
-export async function fetchFilteredInvoices(
+export async function fetchFilteredInvestments(
   query: string,
   currentPage: number,
 ) {
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
   try {
-    const invoices = await sql<InvoicesTable[]>`
+    const investments = await sql<InvestmentsTable[]>`
       SELECT
-        invoices.id,
-        invoices.amount,
-        invoices.date,
-        invoices.status,
-        customers.name,
-        customers.email,
-        customers.image_url
-      FROM invoices
-      JOIN customers ON invoices.customer_id = customers.id
+        investments.id,
+        investments.amount,
+        investments.date,
+        investments.status,
+        companies.name,
+        companies.ticker,
+        companies.image_url
+      FROM investments
+      JOIN companies ON investments.company_id = companies.id
       WHERE
-        customers.name ILIKE ${`%${query}%`} OR
-        customers.email ILIKE ${`%${query}%`} OR
-        invoices.amount::text ILIKE ${`%${query}%`} OR
-        invoices.date::text ILIKE ${`%${query}%`} OR
-        invoices.status ILIKE ${`%${query}%`}
-      ORDER BY invoices.date DESC
+        companies.name ILIKE ${`%${query}%`} OR
+        companies.ticker ILIKE ${`%${query}%`} OR
+        investments.amount::text ILIKE ${`%${query}%`} OR
+        investments.date::text ILIKE ${`%${query}%`} OR
+        investments.status ILIKE ${`%${query}%`}
+      ORDER BY investments.date DESC
       LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
     `;
 
-    return invoices;
+    return investments;
   } catch (error) {
     console.error('Database Error:', error);
-    throw new Error('Failed to fetch invoices.');
+    throw new Error('Failed to fetch investments.');
   }
 }
 
-export async function fetchInvoicesPages(query: string) {
+export async function fetchInvestmentsPages(query: string) {
   try {
     const data = await sql`SELECT COUNT(*)
-    FROM invoices
-    JOIN customers ON invoices.customer_id = customers.id
+    FROM investments
+    JOIN companies ON investments.company_id = companies.id
     WHERE
-      customers.name ILIKE ${`%${query}%`} OR
-      customers.email ILIKE ${`%${query}%`} OR
-      invoices.amount::text ILIKE ${`%${query}%`} OR
-      invoices.date::text ILIKE ${`%${query}%`} OR
-      invoices.status ILIKE ${`%${query}%`}
+      companies.name ILIKE ${`%${query}%`} OR
+      companies.ticker ILIKE ${`%${query}%`} OR
+      investments.amount::text ILIKE ${`%${query}%`} OR
+      investments.date::text ILIKE ${`%${query}%`} OR
+      investments.status ILIKE ${`%${query}%`}
   `;
 
     const totalPages = Math.ceil(Number(data[0].count) / ITEMS_PER_PAGE);
     return totalPages;
   } catch (error) {
     console.error('Database Error:', error);
-    throw new Error('Failed to fetch total number of invoices.');
+    throw new Error('Failed to fetch total number of investments.');
   }
 }
 
-export async function fetchInvoiceById(id: string) {
+export async function fetchInvestmentById(id: string) {
   try {
-    const data = await sql<InvoiceForm[]>`
+    const data = await sql<InvestmentForm[]>`
       SELECT
-        invoices.id,
-        invoices.customer_id,
-        invoices.amount,
-        invoices.status
-      FROM invoices
-      WHERE invoices.id = ${id};
+        investments.id,
+        investments.company_id,
+        investments.amount,
+        investments.status
+      FROM investments
+      WHERE investments.id = ${id};
     `;
 
-    const invoice = data.map((invoice) => ({
-      ...invoice,
+    const investment = data.map((investment) => ({
+      ...investment,
       // Convert amount from cents to dollars
-      amount: invoice.amount / 100,
+      amount: investment.amount / 100,
     }));
     
-    console.log(invoice);
-    return invoice[0];
+    console.log(investment);
+    return investment[0];
   } catch (error) {
     console.error('Database Error:', error);
-    throw new Error('Failed to fetch invoice.');
+    throw new Error('Failed to fetch investment.');
   }
 }
 
-export async function fetchCustomers() {
+export async function fetchCompanies() {
   try {
-    const customers = await sql<CustomerField[]>`
+    const companies = await sql<CompanyField[]>`
       SELECT
         id,
         name
-      FROM customers
+      FROM companies
       ORDER BY name ASC
     `;
 
-    return customers;
+    return companies;
   } catch (err) {
     console.error('Database Error:', err);
-    throw new Error('Failed to fetch all customers.');
+    throw new Error('Failed to fetch all companies.');
   }
 }
 
-export async function fetchFilteredCustomers(query: string) {
+export async function fetchFilteredCompanies(query: string) {
   try {
-    const data = await sql<CustomersTableType[]>`
+    const data = await sql<CompaniesTableType[]>`
 		SELECT
-		  customers.id,
-		  customers.name,
-		  customers.email,
-		  customers.image_url,
-		  COUNT(invoices.id) AS total_invoices,
-		  SUM(CASE WHEN invoices.status = 'pending' THEN invoices.amount ELSE 0 END) AS total_pending,
-		  SUM(CASE WHEN invoices.status = 'paid' THEN invoices.amount ELSE 0 END) AS total_paid
-		FROM customers
-		LEFT JOIN invoices ON customers.id = invoices.customer_id
+		  companies.id,
+		  companies.name,
+		  companies.ticker,
+		  companies.image_url,
+		  COUNT(investments.id) AS total_investments,
+		  SUM(CASE WHEN investments.status = 'pending' THEN investments.amount ELSE 0 END) AS total_pending,
+		  SUM(CASE WHEN investments.status = 'paid' THEN investments.amount ELSE 0 END) AS total_paid
+		FROM companies
+		LEFT JOIN investments ON companies.id = investments.company_id
 		WHERE
-		  customers.name ILIKE ${`%${query}%`} OR
-        customers.email ILIKE ${`%${query}%`}
-		GROUP BY customers.id, customers.name, customers.email, customers.image_url
-		ORDER BY customers.name ASC
+		  companies.name ILIKE ${`%${query}%`} OR
+        companies.ticker ILIKE ${`%${query}%`}
+		GROUP BY companies.id, companies.name, companies.ticker, companies.image_url
+		ORDER BY companies.name ASC
 	  `;
 
-    const customers = data.map((customer) => ({
-      ...customer,
-      total_pending: formatCurrency(customer.total_pending),
-      total_paid: formatCurrency(customer.total_paid),
+    const companies = data.map((company) => ({
+      ...company,
+      total_pending: formatCurrency(company.total_pending),
+      total_paid: formatCurrency(company.total_paid),
     }));
 
-    return customers;
+    return companies;
   } catch (err) {
     console.error('Database Error:', err);
-    throw new Error('Failed to fetch customer table.');
+    throw new Error('Failed to fetch company table.');
   }
 }

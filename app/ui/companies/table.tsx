@@ -2,18 +2,18 @@ import Image from 'next/image';
 import { lusitana } from '@/app/ui/fonts';
 import Search from '@/app/ui/search';
 import {
-  FormattedCustomersTable,
+  FormattedCompaniesTable,
 } from '@/app/lib/definitions';
 
-export default async function CustomersTable({
-  customers,
+export default async function CompaniesTable({
+  companies,
 }: {
-  customers: FormattedCustomersTable[];
+  companies: FormattedCompaniesTable[];
 }) {
   return (
     <div className="w-full">
       <h1 className={`${lusitana.className} mb-8 text-xl md:text-2xl`}>
-        Customers
+        Companies
       </h1>
       <Search placeholder="Search customers..." />
       <div className="mt-6 flow-root">
@@ -21,9 +21,9 @@ export default async function CustomersTable({
           <div className="inline-block min-w-full align-middle">
             <div className="overflow-hidden rounded-md bg-gray-50 p-2 md:pt-0">
               <div className="md:hidden">
-                {customers?.map((customer) => (
+                {companies?.map((company) => (
                   <div
-                    key={customer.id}
+                    key={company.id}
                     className="mb-2 w-full rounded-md bg-white p-4"
                   >
                     <div className="flex items-center justify-between border-b pb-4">
@@ -31,32 +31,32 @@ export default async function CustomersTable({
                         <div className="mb-2 flex items-center">
                           <div className="flex items-center gap-3">
                             <Image
-                              src={customer.image_url}
+                              src={company.image_url}
                               className="rounded-full"
-                              alt={`${customer.name}'s profile picture`}
+                              alt={`${company.name}'s profile picture`}
                               width={28}
                               height={28}
                             />
-                            <p>{customer.name}</p>
+                            <p>{company.name}</p>
                           </div>
                         </div>
                         <p className="text-sm text-gray-500">
-                          {customer.email}
+                          {company.ticker}
                         </p>
                       </div>
                     </div>
                     <div className="flex w-full items-center justify-between border-b py-5">
                       <div className="flex w-1/2 flex-col">
                         <p className="text-xs">Pending</p>
-                        <p className="font-medium">{customer.total_pending}</p>
+                        <p className="font-medium">{company.total_pending}</p>
                       </div>
                       <div className="flex w-1/2 flex-col">
-                        <p className="text-xs">Paid</p>
-                        <p className="font-medium">{customer.total_paid}</p>
+                        <p className="text-xs">Invested</p>
+                        <p className="font-medium">{company.total_paid}</p>
                       </div>
                     </div>
                     <div className="pt-4 text-sm">
-                      <p>{customer.total_invoices} invoices</p>
+                      <p>{company.total_investments} investments</p>
                     </div>
                   </div>
                 ))}
@@ -68,10 +68,10 @@ export default async function CustomersTable({
                       Name
                     </th>
                     <th scope="col" className="px-3 py-5 font-medium">
-                      Email
+                      Ticker
                     </th>
                     <th scope="col" className="px-3 py-5 font-medium">
-                      Total Invoices
+                      Total Investments
                     </th>
                     <th scope="col" className="px-3 py-5 font-medium">
                       Total Pending
@@ -83,31 +83,31 @@ export default async function CustomersTable({
                 </thead>
 
                 <tbody className="divide-y divide-gray-200 text-gray-900">
-                  {customers.map((customer) => (
-                    <tr key={customer.id} className="group">
+                  {companies.map((company) => (
+                    <tr key={company.id} className="group">
                       <td className="whitespace-nowrap bg-white py-5 pl-4 pr-3 text-sm text-black group-first-of-type:rounded-md group-last-of-type:rounded-md sm:pl-6">
                         <div className="flex items-center gap-3">
                           <Image
-                            src={customer.image_url}
+                            src={company.image_url}
                             className="rounded-full"
-                            alt={`${customer.name}'s profile picture`}
+                            alt={`${company.name}'s profile picture`}
                             width={28}
                             height={28}
                           />
-                          <p>{customer.name}</p>
+                          <p>{company.name}</p>
                         </div>
                       </td>
                       <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
-                        {customer.email}
+                        {company.ticker}
                       </td>
                       <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
-                        {customer.total_invoices}
+                        {company.total_investments}
                       </td>
                       <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
-                        {customer.total_pending}
+                        {company.total_pending}
                       </td>
                       <td className="whitespace-nowrap bg-white px-4 py-5 text-sm group-first-of-type:rounded-md group-last-of-type:rounded-md">
-                        {customer.total_paid}
+                        {company.total_paid}
                       </td>
                     </tr>
                   ))}

@@ -11,34 +11,34 @@ const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
 const FormSchema = z.object({
     id: z.string(),
-    customerId: z.string({
-        invalid_type_error: 'Please select a customer.',
+    companyId: z.string({
+        invalid_type_error: 'Please select a company.',
     }),
     amount: z.coerce
         .number()
         .gt(0, { message: 'Please enter an amount greater than $0.' }),
     status: z.enum(['pending', 'paid'], {
-        invalid_type_error: 'Please select an invoice status.', 
+        invalid_type_error: 'Please select an investment status.', 
     }),
     date: z.string(),
 });
 
-const CreateInvoice = FormSchema.omit({ id: true, date: true });
+const CreateInvestment = FormSchema.omit({ id: true, date: true });
 
-const UpdateInvoice = FormSchema.omit({ id: true, date: true });
+const UpdateInvestment = FormSchema.omit({ id: true, date: true });
 
 export type State = {
     errors?: {
-        customerId?: string[];
+        companyId?: string[];
         amount?: string[];
         status?: string[];
     };
     message?: string | null;
 };
 
-export async function createInvoice(prevState: State, formData: FormData) {
-    const validatedFields = CreateInvoice.safeParse({
-        customerId: formData.get('customerId'),
+export async function createInvestment(prevState: State, formData: FormData) {
+    const validatedFields = CreateInvestment.safeParse({
+        companyId: formData.get('companyId'),
         amount: formData.get('amount'),
         status: formData.get('status'),
     });
@@ -46,33 +46,33 @@ export async function createInvoice(prevState: State, formData: FormData) {
     if (!validatedFields.success) {
         return {
             errors: validatedFields.error.flatten().fieldErrors,
-            message: 'Missing Fields. Failed to Create Invoice.',
+            message: 'Missing Fields. Failed to Create Investment.',
         };
     }
 
-    const { customerId, amount, status } = validatedFields.data;
+    const { companyId, amount, status } = validatedFields.data;
     const amountInCents = amount * 100;
     const date = new Date().toISOString().split('T')[0];
 
     try  {
         await sql`
-        INSERT INTO invoices (customer_id, amount, status, date)
-        VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
+        INSERT INTO investments (company_id, amount, status, date)
+        VALUES (${companyId}, ${amountInCents}, ${status}, ${date})
         `;
     } catch (error) {
         console.error(error);
         return {
-            message: 'Database Error: Failed to Create Invoice.',
+            message: 'Database Error: Failed to Create Investment.',
         };
     }
 
-    revalidatePath('/dashboard/invoices');
-    redirect('/dashboard/invoices');
+    revalidatePath('/dashboard/investments');
+    redirect('/dashboard/investments');
 }
 
-export async function updateInvoice(id: string, prevState: State, formData: FormData) {
-    const validatedFields = UpdateInvoice.safeParse({
-        customerId: formData.get('customerId'),
+export async function updateInvestment(id: string, prevState: State, formData: FormData) {
+    const validatedFields = UpdateInvestment.safeParse({
+        companyId: formData.get('companyId'),
         amount: formData.get('amount'),
         status: formData.get('status'),
     });
@@ -80,31 +80,31 @@ export async function updateInvoice(id: string, prevState: State, formData: Form
     if (!validatedFields.success) {
         return {
             errors: validatedFields.error.flatten().fieldErrors,
-            message: 'Missing Fields. Failed to Update Invoice.',
+            message: 'Missing Fields. Failed to Update Investment.',
         };
     }
 
-    const { customerId, amount, status } = validatedFields.data;
+    const { companyId, amount, status } = validatedFields.data;
     const amountInCents = amount * 100;
 
     try {
         await sql`
-            UPDATE invoices
-            SET customer_id = ${customerId}, amount = ${amountInCents}, status = ${status}
+            UPDATE investments
+            SET company_id = ${companyId}, amount = ${amountInCents}, status = ${status}
             WHERE id = ${id}
         `;
     } catch (error) {
         console.error(error);
-        return { message: 'Database Error. Failed to Update Invoice.' };
+        return { message: 'Database Error. Failed to Update Investment.' };
     }
 
-    revalidatePath('/dashboard/invoices');
-    redirect('/dashboard/invoices');
+    revalidatePath('/dashboard/investments');
+    redirect('/dashboard/investments');
 }
 
-export async function deleteInvoice(id: string) {
-    await sql`DELETE FROM invoices WHERE id = ${id}`;
-    revalidatePath('/dashboard/invoices');
+export async function deleteInvestment(id: string) {
+    await sql`DELETE FROM investments WHERE id = ${id}`;
+    revalidatePath('/dashboard/investments');
 }
 
 export async function authenticate(

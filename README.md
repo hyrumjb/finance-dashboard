@@ -1,5 +1,5 @@
-## Next.js App Router Course - Starter
+## Dhana Financial Appa
 
-This is the starter template for the Next.js App Router Course. It contains the starting code for the dashboard application.
+This used to be the starter template for the Next.js App Router Course. It used to contain the starting code for the dashboard application.
 
-For more information, see the [course curriculum](https://nextjs.org/learn) on the Next.js Website.
+Here's my own take on this dashboard, but now turning it into a beautiful financial app. The name comes from the Sanskrit word for wealth.
