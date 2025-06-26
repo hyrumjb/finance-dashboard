@@ -1,28 +1,28 @@
 import Form from '@/app/ui/investments/create-form';
 import Breadcrumbs from '@/app/ui/investments/breadcrumbs';
-import { fetchCustomers } from '@/app/lib/data';
+import { fetchCompanies } from '@/app/lib/data';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-    title: 'Create Invoice',
+    title: 'Create Investment',
 };
 
 export default async function Page() {
-    const customers = await fetchCustomers();
+    const companies = await fetchCompanies();
 
     return (
         <main>
             <Breadcrumbs
                 breadcrumbs={[
-                    { label: 'Invoices', href:'/dashboard/invoices' },
+                    { label: 'Investments', href:'/dashboard/investments' },
                     {
-                        label: 'Create Invoice',
-                        href: '/dashboard/invoices/create',
+                        label: 'Create Investment',
+                        href: '/dashboard/investments/create',
                         active: true,
                     },
                 ]}
             />
-            <Form customers={customers} />
+            <Form companies={companies} />
         </main>
     );
 }
