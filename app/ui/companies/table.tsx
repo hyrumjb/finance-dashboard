@@ -15,7 +15,7 @@ export default async function CompaniesTable({
       <h1 className={`${lusitana.className} mb-8 text-xl md:text-2xl`}>
         Companies
       </h1>
-      <Search placeholder="Search customers..." />
+      <Search placeholder="Search companies..." />
       <div className="mt-6 flow-root">
         <div className="overflow-x-auto">
           <div className="inline-block min-w-full align-middle">
