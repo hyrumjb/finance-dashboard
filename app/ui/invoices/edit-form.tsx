@@ -114,6 +114,9 @@ export default function EditInvoiceForm({
             </div>
           </div>
         </fieldset>
+        {state?.message && (
+          <div className="mt-4 text-sm text-red-500">{state.message}</div>
+        )}
       </div>
       <div className="mt-6 flex justify-end gap-4">
         <Link
