@@ -24,9 +24,9 @@ const iconMap = {
 
 export default async function CardWrapper() {
   const {
-    numberOfInvestments,
+    // numberOfInvestments,
     numberOfCompanies,
-    totalPaidInvestments,
+    // totalPaidInvestments,
     totalPendingInvestments,
     portfolioValue,
     netWorth,

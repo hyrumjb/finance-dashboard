@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { lusitana } from '@/app/ui/fonts';
-import { ChartPieIcon, ArrowTrendingUpIcon, ArrowTrendingDownIcon, EyeIcon } from '@heroicons/react/24/outline';
+import { ChartPieIcon, ArrowTrendingUpIcon, EyeIcon } from '@heroicons/react/24/outline';
 
 export const metadata: Metadata = {
   title: 'Portfolio Analysis',

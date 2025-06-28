@@ -62,7 +62,7 @@ export default async function Page() {
                                 Budget Alert
                             </h3>
                             <p className="text-sm text-yellow-700 mt-1">
-                                You've spent 85% of your entertainment budget this month. Consider reducing spending in this category.
+                                You&apos;ve spent 85% of your entertainment budget this month. Consider reducing spending in this category.
                             </p>
                         </div>
                     </div>

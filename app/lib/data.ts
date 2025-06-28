@@ -65,7 +65,7 @@ export async function fetchCardData() {
 
     // Calculate personal finance metrics
     const totalPaidAmount = Number(data[2][0].paid ?? '0') / 100;
-    const totalPendingAmount = Number(data[2][0].pending ?? '0') / 100;
+    // const totalPendingAmount = Number(data[2][0].pending ?? '0') / 100;
     
     // Portfolio value (assuming some growth on investments)
     const portfolioValue = formatCurrency((totalPaidAmount * 1.08) * 100); // 8% assumed growth
