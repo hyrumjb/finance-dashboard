@@ -86,3 +86,42 @@ export type InvestmentForm = {
   amount: number;
   status: 'pending' | 'paid';
 };
+
+// New types for personal finance features
+export type PortfolioPerformance = {
+  totalValue: number;
+  totalGain: number;
+  percentageGain: number;
+  monthlyChange: number;
+};
+
+export type AssetAllocation = {
+  category: string;
+  amount: number;
+  percentage: number;
+  color: string;
+};
+
+export type FinancialGoal = {
+  id: string;
+  name: string;
+  targetAmount: number;
+  currentAmount: number;
+  targetDate: string;
+  category: 'savings' | 'investment' | 'debt' | 'emergency';
+  priority: 'low' | 'medium' | 'high';
+};
+
+export type MonthlyBudget = {
+  category: string;
+  budgeted: number;
+  spent: number;
+  remaining: number;
+};
+
+export type CashFlow = {
+  month: string;
+  income: number;
+  expenses: number;
+  netFlow: number;
+};

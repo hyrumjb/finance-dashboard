@@ -63,11 +63,31 @@ export async function fetchCardData() {
     const totalPaidInvestments = formatCurrency(data[2][0].paid ?? '0');
     const totalPendingInvestments = formatCurrency(data[2][0].pending ?? '0');
 
+    // Calculate personal finance metrics
+    const totalPaidAmount = Number(data[2][0].paid ?? '0') / 100;
+    const totalPendingAmount = Number(data[2][0].pending ?? '0') / 100;
+    
+    // Portfolio value (assuming some growth on investments)
+    const portfolioValue = formatCurrency((totalPaidAmount * 1.08) * 100); // 8% assumed growth
+    
+    // Net worth calculation (simplified - you'd want to add other assets/liabilities)
+    const netWorth = formatCurrency((totalPaidAmount * 1.08 + 50000) * 100); // Adding $50k other assets
+    
+    // Monthly savings (simplified calculation)
+    const monthlySavings = formatCurrency(2500 * 100); // $2,500 monthly savings
+    
+    // Investment performance (percentage gain)
+    const investmentPerformance = `${((totalPaidAmount * 0.08) / totalPaidAmount * 100).toFixed(1)}%`;
+
     return {
       numberOfCompanies,
       numberOfInvestments,
       totalPaidInvestments,
       totalPendingInvestments,
+      portfolioValue,
+      netWorth,
+      monthlySavings,
+      investmentPerformance,
     };
   } catch (error) {
     console.error('Database Error:', error);

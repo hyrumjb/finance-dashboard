@@ -3,6 +3,10 @@ import {
   ClockIcon,
   UserGroupIcon,
   InboxIcon,
+  ChartBarIcon,
+  ArrowTrendingUpIcon,
+  CreditCardIcon,
+  CurrencyDollarIcon,
 } from '@heroicons/react/24/outline';
 import { lusitana } from '@/app/ui/fonts';
 import { fetchCardData } from '@/app/lib/data';
@@ -12,6 +16,10 @@ const iconMap = {
   companies: UserGroupIcon,
   pending: ClockIcon,
   investments: InboxIcon,
+  portfolio: ChartBarIcon,
+  netWorth: ArrowTrendingUpIcon,
+  savings: CreditCardIcon,
+  performance: CurrencyDollarIcon,
 };
 
 export default async function CardWrapper() {
@@ -20,20 +28,20 @@ export default async function CardWrapper() {
     numberOfCompanies,
     totalPaidInvestments,
     totalPendingInvestments,
+    portfolioValue,
+    netWorth,
+    monthlySavings,
+    investmentPerformance,
   } = await fetchCardData();
 
   return (
     <>
-      {/* NOTE: Uncomment this code in Chapter 9 */}
-
-      <Card title="Invested" value={totalPaidInvestments} type="collected" />
-      <Card title="Pending" value={totalPendingInvestments} type="pending" />
-      <Card title="Total Investments" value={numberOfInvestments} type="investments" />
-      <Card
-        title="Total Companies"
-        value={numberOfCompanies}
-        type="companies"
-      />
+      <Card title="Portfolio Value" value={portfolioValue} type="portfolio" />
+      <Card title="Net Worth" value={netWorth} type="netWorth" />
+      <Card title="Monthly Savings" value={monthlySavings} type="savings" />
+      <Card title="Investment Performance" value={investmentPerformance} type="performance" />
+      <Card title="Pending Investments" value={totalPendingInvestments} type="pending" />
+      <Card title="Total Companies" value={numberOfCompanies} type="companies" />
     </>
   );
 }
@@ -45,7 +53,7 @@ export function Card({
 }: {
   title: string;
   value: number | string;
-  type: 'investments' | 'companies' | 'pending' | 'collected';
+  type: 'investments' | 'companies' | 'pending' | 'collected' | 'portfolio' | 'netWorth' | 'savings' | 'performance';
 }) {
   const Icon = iconMap[type];
 
